@@ -15,6 +15,13 @@ source venv/bin/activate
 pip3 install -r requirements.txt
 python3 -m mqtthandler
 ```
-If your database has a password, rename .env.example to .env and replace the password with your databases password.
+
+## Configuration
+If the database has a password, rename `.env.example` to `.env` and replace the password with your databases password.
+To choose a development or production config include `export HANDLER_ENV=development` in the `.env` file.
+To use the offline mqtt broker with randomly generated data:
+- Make sure mosquitto mqtt broker is installed on your system,
+- `mosquitto` executable is in your `PATH`,
+- add `export OFFLINE=True` (Any string is valid) to the `.env`.
 
 To increase the verbosity either use `python3 -m mqtthandler -v` or to show all debug messages `python3 -m mqtthandler -d`.
