@@ -6,13 +6,15 @@ This python module connects to the in `config.py` specified mqtt broker and subs
 If incoming messages are getting parsed and - if successfully parsed - are getting added to a database, also specified in `config.py`
 
 ## Usage
+
 ```
-git clone https://github.com/lheimbs/smrt-uncrn-dsh-collector.git
+git clone git@github.com:lheimbs/smrt-uncrn-dsh-collector.git
 cd smrt-uncrn-dsh-collector
 python3 -m venv venv
 source venv/bin/activate
 pip3 install -r requirements.txt
 python3 -m mqtthandler
 ```
+If your database has a password, rename .env.example to .env and replace the password with your databases password.
 
 To increase the verbosity either use `python3 -m mqtthandler -v` or to show all debug messages `python3 -m mqtthandler -d`.
