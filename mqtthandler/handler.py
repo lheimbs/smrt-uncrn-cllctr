@@ -71,15 +71,7 @@ def on_message(client, userdata, msg):
         sql.add_mqtt_to_db(datetime.now(), topic, payload, msg.qos, msg.retain)
 
 
-def main():
-    logger.debug(f"Config: {config.__class__}")
-    client = mqtt.Client()
-    broker = None
-
-    mqtt_logger = logging.getLogger('client')
-    mqtt_logger.setLevel(logging.INFO)
-    client.enable_logger(logger=mqtt_logger)
-
+def add_mqtt_callbacks(client):
     client.on_connect = on_connect
     client.on_message = on_message
 
@@ -92,9 +84,24 @@ def main():
     client.message_callback_add("mqtt/esp_bme_rf/status", handle_states)
     client.message_callback_add("mqtt/voice_assistant/status", handle_states)
 
+
+def main():
+    logger.debug(f"CONFIG: {str(config)[27:-2]}")
+    logger.debug(f"DATABASE_URI: {config.SQLALCHEMY_DATABASE_URI}")
+    logger.debug(f"MQTT_SERVER: {config.MQTT_SERVER}:{config.MQTT_PORT}")
+
+    client = mqtt.Client()
+    broker = None
+
+    mqtt_logger = logging.getLogger('client')
+    mqtt_logger.setLevel(logging.INFO)
+    client.enable_logger(logger=mqtt_logger)
+
+    add_mqtt_callbacks(client)
+
     # connect to broker
-    if config.MQTT_SERVER == 'localhost':
-        logger.info(f"Using development broker: {config.MQTT_SERVER}.")
+    if config.OFFLINE and config.MQTT_SERVER == 'localhost':
+        logger.info("Using local development broker.")
 
         sys.stdout = LogPipe(logging.DEBUG, 'local_broker')
         sys.stderr = LogPipe(logging.INFO, 'local_broker')
@@ -112,14 +119,14 @@ def main():
         client = connect(client)
 
     try:
-        if config.DEBUG:
+        if config.OFFLINE and config.MQTT_SERVER == 'localhost':
             start_time = time.time()
             rand_time = random.randint(3, 9)
             choice = 'roomdata'
             client.loop_start()
 
         while client:
-            if config.DEBUG:
+            if config.OFFLINE and config.MQTT_SERVER == 'localhost':
                 if time.time() % rand_time == 0:
                     choice = random_publish(choice, config.MQTT_PORT)
                     rand_time = random.randint(10, 90)

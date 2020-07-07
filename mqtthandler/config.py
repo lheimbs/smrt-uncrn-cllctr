@@ -2,17 +2,14 @@
 import os
 from dotenv import load_dotenv
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-print(BASE_DIR)
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 load_dotenv(os.path.join(BASE_DIR, '.env'))
-
-env = os.environ.get('HANDLER_ENV', 'DEBUG')
 
 class Config:
     """Mqtthandler configuration variables."""
 
-    DEBUG = False
     TESTING = False
+    OFFLINE = os.environ.get('OFFLINE', '')
     MQTT_SERVER = 'lennyspi.local'
 
     SQLALCHEMY_DATABASE_URI = 'sqlite:///data.db'
@@ -56,6 +53,7 @@ class ProductionConfig(Config):
 
 
 class DevelopmentConfig(Config):
+    """ use development database server"""
     SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}:{}/{}'.format(
         os.environ.get('DATABASE_USER', 'pi'),
         os.environ.get('DATABASE_PASSWORD', ''),
@@ -82,20 +80,20 @@ class DevelopmentConfig(Config):
     }
     MQTT_SERVER = 'localhost'
     MQTT_PORT = 1883
-    DEBUG = True
 
 
 class OfflineConfig(Config):
-    DEBUG = True
+    """ use offline database server """
     MQTT_SERVER = 'localhost'
     MQTT_PORT = 1883
-    DROP_ALL = True
 
 
 class TestingConfig(Config):
-    MQTT_SERVER = 'localhost'
-    DEBUG = True
+    """ TBD: Testing config """
+    pass
 
+
+env = os.environ.get('HANDLER_ENV', 'DEBUG')
 
 if env == 'production':
     config = ProductionConfig
@@ -106,4 +104,4 @@ elif env == 'testing':
 elif env == 'offline':
     config = OfflineConfig
 else:
-    config = DevelopmentConfig
+    config = Config

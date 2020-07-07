@@ -19,6 +19,7 @@ python3 -m mqtthandler
 ## Configuration
 If the database has a password, rename `.env.example` to `.env` and replace the password with your databases password.
 To choose a development or production config include `export HANDLER_ENV=development` in the `.env` file.
+
 To use the offline mqtt broker with randomly generated data:
 - Make sure mosquitto mqtt broker is installed on your system,
 - `mosquitto` executable is in your `PATH`,
