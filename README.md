@@ -1,4 +1,4 @@
-# smrt-uncrn-dsh-mqtthandler
+# smrt-uncrn-cllctr
 Connect incoming Mqtt-Messages to Database
 
 ## About
@@ -8,8 +8,8 @@ If incoming messages are getting parsed and - if successfully parsed - are getti
 ## Usage
 
 ```
-git clone git@github.com:lheimbs/smrt-uncrn-dsh-collector.git
-cd smrt-uncrn-dsh-collector
+git clone git@github.com:lheimbs/smrt-uncrn-cllctr.git
+cd smrt-uncrn-cllctr
 python3 -m venv venv
 source venv/bin/activate
 pip3 install -r requirements.txt
