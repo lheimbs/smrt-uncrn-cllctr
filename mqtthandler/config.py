@@ -8,30 +8,13 @@ load_dotenv(verbose=True)
 
 class Config:
     """Flask configuration variables."""
-
-    # General Config
-    FLASK_APP = os.environ.get('FLASK_APP')
-    FLASK_ENV = os.environ.get('FLASK_ENV')
-    SECRET_KEY = os.environ.get('SECRET_KEY')
-
-    DISABLE_CACHE = os.environ.get("FLASK_APP_DISABLE_CACHE", "")
-    DISABLE_FORCE_HTTPS = os.environ.get("FLASK_APP_DISABLE_FORCE_HTTPS", "")
-
-    # Static Assets
-    STATIC_FOLDER = 'static'
-    TEMPLATES_FOLDER = 'templates'
-
     DEBUG = False
     TESTING = False
-    DB_NAME = 'data'
-    MQTT_SERVER = 'lennyspi.local'
-    MQTT_PORT = 8833
-    SECRET_KEY = 'key'
-    ADMIN = {
-        'username': os.environ.get('FLASK_APP_ADMIN', 'admin'),
-        'email': os.environ.get('FLASK_APP_ADMIN_EMAIL', 'admin@admin.de'),
-        'password': os.environ.get('FLASK_APP_ADMIN_PASSWORD', 'admin')
-    }
+
+    MQTT_SERVER = os.environ.get('MQTT_SERVER', 'lennyspi.local')
+    MQTT_PORT = os.environ.get('MQTT_PORT', 8833)
+
+    OFFLINE = os.environ.get('HANDLER_OFFLINE', '')
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
