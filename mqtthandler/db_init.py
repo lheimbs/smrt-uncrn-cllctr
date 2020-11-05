@@ -11,6 +11,10 @@ from .config import config
 
 logger = logging.getLogger()
 
+logger.debug(f"CONFIG: {str(config)[27:-2]}")
+logger.debug(f"DATABASE_URI: {config.SQLALCHEMY_DATABASE_URI}")
+logger.debug(f"MQTT_SERVER: {config.MQTT_SERVER}:{config.MQTT_PORT}")
+
 # init engines
 engine = create_engine(config.SQLALCHEMY_DATABASE_URI)
 engine_probes = create_engine(config.SQLALCHEMY_BINDS['probe_request'])
