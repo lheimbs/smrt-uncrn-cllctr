@@ -57,7 +57,7 @@ def handle_battery_level(client, userdata, msg):
         logger.debug("Could not detect Battery level.")
 
     try:
-        import rf_handler
+        import mqtthandler.rf_handler as rf_handler
         imported = True
     except ImportError:
         imported = False
@@ -65,10 +65,10 @@ def handle_battery_level(client, userdata, msg):
     if imported:
         if 0 < n_level <= 20:
             logger.info("Battery low detected. Turn Socket on.")
-            rf_handler.turn_socket_on(2, "rpi_rf")
+            rf_handler.turn_socket_on(4, "rpi_rf")
         elif n_level >= 80:
             logger.info("Battery high detected. Turn socket off.")
-            rf_handler.turn_socket_off(2, "rpi_rf")
+            rf_handler.turn_socket_off(4, "rpi_rf")
     else:
         logger.info("Module 'rf_handler' is not avaliable. Skip battery handling.")
 
@@ -91,6 +91,7 @@ def handle_probes(client, userdata, msg):
 
 
 def handle_tablet_charging(client, userdata, msg):
+    pass
     payload = msg.payload.decode("utf-8")
     curr_time = datetime.now()
 

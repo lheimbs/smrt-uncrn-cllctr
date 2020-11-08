@@ -24,6 +24,7 @@ from mqtthandler.callbacks import (
     handle_tablet_charging
 )
 
+STATUS_TOPIC = "mqtt/smrt-uncrn-cllctr/status"
 logger = logging.getLogger('mqtt_handler')
 
 
@@ -40,6 +41,7 @@ def connect(client, brokers=None, port=None):
             try:
                 client.connect(host, port, 60)
                 logger.info(f"Connected to broker on host {host}.")
+                client.will_set(STATUS_TOPIC, "offline")
                 break
             except ConnectionRefusedError:
                 logger.warning("Broker refused connection. Are host/port correct?")
@@ -57,6 +59,8 @@ def on_connect(client, userdata, flags, rc):
     topic = '#'
     client.subscribe(topic)
     logger.info(f"Subscribed to topic '{topic}'.")
+    client.publish(STATUS_TOPIC, "online")
+    logger.debug("Published online status")
 
 
 def on_message(client, userdata, msg):
@@ -80,9 +84,7 @@ def add_mqtt_callbacks(client):
     client.message_callback_add("tablet/shield/battery", handle_battery_level)
     client.message_callback_add("tablet/shield/charging", handle_tablet_charging)
     client.message_callback_add("mqtt/probes", handle_probes)
-    client.message_callback_add("mqtt/computer/status", handle_states)
-    client.message_callback_add("mqtt/esp_bme_rf/status", handle_states)
-    client.message_callback_add("mqtt/voice_assistant/status", handle_states)
+    client.message_callback_add("mqtt/+/status", handle_states)
 
 
 def main():
