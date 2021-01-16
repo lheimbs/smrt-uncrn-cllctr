@@ -5,8 +5,8 @@ import logging
 import json
 from datetime import datetime
 
-import mqtthandler.sql as sql
-# from mqtthandler.detached import detachify
+from . import sql
+# from .detached import detachify
 
 logger = logging.getLogger()
 
