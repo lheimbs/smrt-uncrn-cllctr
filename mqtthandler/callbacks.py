@@ -12,7 +12,7 @@ logger = logging.getLogger()
 
 def temp_message_to_db(client, userdata, msg):
     payload = msg.payload.decode("utf-8")
-    logger.debug(f"Add new RoomData reading into database: {payload}.")
+    logger.info(f"Add new RoomData reading into database: {payload}.")
 
     curr_time = datetime.now()
     try:
@@ -29,7 +29,7 @@ def temp_message_to_db(client, userdata, msg):
 
 def handle_rf_transmission(client, userdata, msg):
     payload = msg.payload.decode("utf-8")
-    logger.debug(f"Add new RF transmission into database: {payload}.")
+    logger.info(f"Add new RF transmission into database: {payload}.")
 
     curr_time = datetime.now()
     try:
@@ -45,7 +45,7 @@ def handle_rf_transmission(client, userdata, msg):
 
 def handle_battery_level(client, userdata, msg):
     payload = msg.payload.decode("utf-8")
-    logger.debug(f"Add new Tablet Battery info into database: {payload}.")
+    logger.info(f"Add new Tablet Battery info into database: {payload}.")
     curr_time = datetime.now()
 
     try:
@@ -70,12 +70,12 @@ def handle_battery_level(client, userdata, msg):
             logger.info("Battery high detected. Turn socket off.")
             rf_handler.turn_socket_off(4, "rpi_rf")
     else:
-        logger.info("Module 'rf_handler' is not avaliable. Skip battery handling.")
+        logger.error("Module 'rf_handler' is not avaliable. Skip battery handling.")
 
 
 def handle_probes(client, userdata, msg):
     payload = msg.payload.decode("utf-8")
-    logger.debug(f"Add new Probe Request into database: {payload}.")
+    logger.info(f"ProbeRequest recieved: {payload}.")
 
     try:
         probe_request = json.loads(payload)
@@ -99,7 +99,7 @@ def handle_tablet_charging(client, userdata, msg):
     if len(split_topic) == 2:
         device = split_topic[1]
 
-        logger.debug(f"Add new State into database: {device}: {payload}.")
+        logger.info(f"Add new State into database: {device}: {payload}.")
         sql.add_state_to_db(curr_time, device, payload)
     else:
         logger.warning("Could not extract device name from topic. Aborting.")
@@ -113,7 +113,7 @@ def handle_states(client, userdata, msg):
     if len(split_topic) == 2:
         device = split_topic[1]
 
-        logger.debug(f"Add new State into database: {device}: {payload}.")
+        logger.info(f"Add new State into database: {device}: {payload}.")
         sql.add_state_to_db(curr_time, device, payload)
     else:
         logger.warning("Could not extract device name from topic. Aborting.")

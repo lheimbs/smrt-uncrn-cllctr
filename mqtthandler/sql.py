@@ -10,7 +10,12 @@
 # from models.Tablet import TabletBattery      # noqa: E402
 # from models.ProbeRequest import ProbeRequest      # noqa: E402
 
-from .db_init import Mqtt, State, RfData, RoomData, TabletBattery, ProbeRequest, db_session
+import logging
+logger = logging.getLogger()
+
+from .db_init import Mqtt, State, RfData, RoomData, TabletBattery, db_session, connect_db
+from .detached import detachify
+from .mac_vendor import get_mac_vendor
 
 def add_mqtt_to_db(time, topic, payload, qos, retain):
     new_data = Mqtt(
@@ -65,7 +70,21 @@ def add_tablet_battery_level(curr_time, n_level):
         session.add(new_data)
 
 
-def add_probe_request(time, macaddress, make, ssid, rssi, **kwargs):
+@detachify
+def add_probe_request(time, macaddress, ssid, rssi, **kwargs):
+    _, _, _, _, _, ProbeRequest, db_session = connect_db()
+    if 'make' in kwargs.keys() and kwargs['make']:
+        make = kwargs['make']
+    else:
+        logger.debug("MAC vendor is missing.")
+        with db_session() as session:
+            make = session.query(ProbeRequest.make).filter(ProbeRequest.macaddress == macaddress).first()
+            if make and make[0]:
+                make = make[0]
+            else:
+                logger.info(f"No known mac vendor for mac '{macaddress}'. Searching the internet.")
+                make = get_mac_vendor(macaddress)
+
     new_data = ProbeRequest(
         date=time,
         macaddress=macaddress,
@@ -73,6 +92,7 @@ def add_probe_request(time, macaddress, make, ssid, rssi, **kwargs):
         ssid=ssid,
         rssi=rssi,
     )
+    logger.info(f"Add proberequest <ProbeRequest date={time}, macaddress={macaddress}, make={make}, ssid={ssid}, rssi={rssi}> to database.")
     with db_session() as session:
         session.add(new_data)
 

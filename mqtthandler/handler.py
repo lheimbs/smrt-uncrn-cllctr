@@ -120,9 +120,9 @@ def main():
     else:
         client = connect(client)
 
+    start_time = time.time()
     try:
         if config.OFFLINE and config.MQTT_SERVER == 'localhost':
-            start_time = time.time()
             rand_time = random.randint(3, 9)
             choice = 'roomdata'
             client.loop_start()
@@ -136,6 +136,8 @@ def main():
                     random_publish('roomdata', config.MQTT_PORT)
                     start_time = time.time()
             else:
+                if start_time % 3600 == 0:
+                    client.publish(STATUS_TOPIC, "online")
                 client.loop()
 
     except KeyboardInterrupt:
