@@ -10,12 +10,12 @@ import random
 import paho.mqtt.client as mqtt
 from datetime import datetime
 
-from mqtthandler.config import config
-from mqtthandler.PipeLogging import LogPipe
-from mqtthandler.random_data import random_publish
-import mqtthandler.sql as sql
+from .config import config
+from .PipeLogging import LogPipe
+from .random_data import random_publish
+from . import sql
 
-from mqtthandler.callbacks import (
+from .callbacks import (
     temp_message_to_db,
     handle_rf_transmission,
     handle_battery_level,
@@ -91,7 +91,6 @@ def main():
     logger.debug(f"MQTT_SERVER: {config.MQTT_SERVER}:{config.MQTT_PORT}")
 
     client = mqtt.Client()
-    broker = None
 
     mqtt_logger = logging.getLogger('client')
     mqtt_logger.setLevel(logging.INFO)
@@ -99,8 +98,32 @@ def main():
 
     add_mqtt_callbacks(client)
 
+    if config.OFFLINE:
+        run_with_offline_debugging_mqtt_server(client, logger)
+    else:
+        run_with_remote_mqtt_server(client, logger)
+
+
+def run_with_remote_mqtt_server(client, logger):
+    client = connect(client)
+
+    try:
+        client.loop_forever()
+
+    except KeyboardInterrupt:
+        logger.info("Script stopped through Keyboard Interrupt")
+        if config.DEBUG:
+            client.loop_stop()
+    finally:
+        logger.info("Disconnecting client from broker.")
+        if client and client.is_connected:
+            client.disconnect()
+
+
+def run_with_offline_debugging_mqtt_server(client, logger):
+    broker = None
     # connect to broker
-    if config.OFFLINE and config.MQTT_SERVER == 'localhost':
+    if config.MQTT_SERVER == 'localhost':
         logger.info("Using local development broker.")
 
         sys.stdout = LogPipe(logging.DEBUG, 'local_broker')
@@ -119,14 +142,14 @@ def main():
         client = connect(client)
 
     try:
-        if config.OFFLINE and config.MQTT_SERVER == 'localhost':
+        if config.MQTT_SERVER == 'localhost':
             start_time = time.time()
             rand_time = random.randint(3, 9)
             choice = 'roomdata'
             client.loop_start()
 
         while client:
-            if config.OFFLINE and config.MQTT_SERVER == 'localhost':
+            if config.MQTT_SERVER == 'localhost':
                 if time.time() % rand_time == 0:
                     choice = random_publish(choice, config.MQTT_PORT)
                     rand_time = random.randint(10, 90)
@@ -151,3 +174,7 @@ def main():
             sys.stderr.close()
             sys.stderr = sys.__stderr__
             broker.terminate()
+
+
+if __name__ == "__main__":
+    main()
