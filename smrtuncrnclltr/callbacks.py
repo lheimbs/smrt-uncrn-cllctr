@@ -57,7 +57,7 @@ def handle_battery_level(client, userdata, msg):
         logger.debug("Could not detect Battery level.")
 
     try:
-        import mqtthandler.rf_handler as rf_handler
+        import smrtuncrnclltr.rf_handler as rf_handler
         imported = True
     except ImportError:
         imported = False
