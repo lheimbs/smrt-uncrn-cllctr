@@ -13,6 +13,9 @@ class Config:
 
     MQTT_SERVER = os.environ.get('MQTT_SERVER', 'lennyspi.local')
     MQTT_PORT = os.environ.get('MQTT_PORT', 8833)
+    MQTT_CA_CERTS = os.environ.get('MQTT_CA_CERTS', '')
+    MQTT_CERTFILE = os.environ.get('MQTT_CERTFILE', '')
+    MQTT_KEYFILE = os.environ.get('MQTT_KEYFILE', '')
 
     OFFLINE = os.environ.get('HANDLER_OFFLINE', '')
 

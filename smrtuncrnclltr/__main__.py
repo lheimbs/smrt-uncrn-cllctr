@@ -39,9 +39,11 @@ def connect(client, brokers=None, port=None):
         logger.debug(f"Try connection to broker {host} on port {port}.")
         if sock.connect_ex((host, port)) == 0:
             try:
+                client = add_tls_ssl(client)
                 client.connect(host, port, 60)
                 logger.info(f"Connected to broker on host {host}.")
                 client.will_set(STATUS_TOPIC, "offline")
+
                 break
             except ConnectionRefusedError:
                 logger.warning("Broker refused connection. Are host/port correct?")
@@ -52,6 +54,17 @@ def connect(client, brokers=None, port=None):
     else:
         logger.error("Could not connect to broker.")
         return None
+    return client
+
+
+def add_tls_ssl(client):
+    ca_certs = config.MQTT_CA_CERTS if config.MQTT_CA_CERTS else None
+    certfile = config.MQTT_CERTFILE if config.MQTT_CERTFILE else None
+    keyfile = config.MQTT_KEYFILE if config.MQTT_KEYFILE else None
+
+    client.tls_set(
+        ca_certs=ca_certs, certfile=certfile, keyfile=keyfile
+    )
     return client
 
 
